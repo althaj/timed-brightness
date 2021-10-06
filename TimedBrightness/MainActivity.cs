@@ -7,23 +7,60 @@ using AndroidX.AppCompat.Widget;
 using AndroidX.AppCompat.App;
 using Google.Android.Material.FloatingActionButton;
 using Google.Android.Material.Snackbar;
+using Android.Widget;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using AndroidX.RecyclerView.Widget;
 
 namespace TimedBrightness
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
+        List<BrightnessSetting> brightnessSettings = new List<BrightnessSetting>();
+        RecyclerView recyclerView;
+        RecyclerView.LayoutManager layoutManager;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
-            Toolbar toolbar = FindViewById<Toolbar>(Resource.Id.toolbar);
+            AndroidX.AppCompat.Widget.Toolbar toolbar = FindViewById<AndroidX.AppCompat.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
             FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.Click += FabOnClick;
+
+            // Build sample data
+            brightnessSettings.Add(new BrightnessSetting()
+            {
+                Hour = 8,
+                MinuteString = "30",
+                Brightness = 0.9f
+            });
+
+            brightnessSettings.Add(new BrightnessSetting()
+            {
+                Hour = 20,
+                MinuteString = "00",
+                Brightness = 0.5f
+            });
+
+            brightnessSettings.Add(new BrightnessSetting()
+            {
+                Hour = 22,
+                MinuteString = "30",
+                Brightness = 0.2f
+            });
+
+
+            BrightnessSettingAdapter adapter = new BrightnessSettingAdapter(this, brightnessSettings);
+            recyclerView = FindViewById<RecyclerView>(Resource.Id.brightnessList);
+            layoutManager = new GridLayoutManager(this, 1, GridLayoutManager.Vertical, false);
+            recyclerView.SetLayoutManager(layoutManager);
+            recyclerView.SetAdapter(adapter);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -46,8 +83,13 @@ namespace TimedBrightness
         private void FabOnClick(object sender, EventArgs eventArgs)
         {
             View view = (View) sender;
-            Snackbar.Make(view, "Replace with your own action", Snackbar.LengthLong)
-                .SetAction("Action", (View.IOnClickListener)null).Show();
+            brightnessSettings.Add(new BrightnessSetting()
+            {
+                Hour = 12,
+                MinuteString = "00",
+                Brightness = 0.5f
+            });
+            recyclerView.GetAdapter().NotifyDataSetChanged();
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -56,5 +98,5 @@ namespace TimedBrightness
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-	}
+    }
 }
