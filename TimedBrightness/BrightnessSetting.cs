@@ -114,7 +114,7 @@ namespace TimedBrightness
             animation.Duration = 300;
             layout.StartAnimation(animation);
 
-            Handler h = new Handler();
+            Handler h = new Handler(Looper.MainLooper);
             Action deleteAction = () =>
             {
                 items.RemoveAt(view.GetChildAdapterPosition(layout));

@@ -9,13 +9,54 @@
     tools:showIn="@layout/activity_main"
     android:minWidth="25px"
     android:minHeight="25px">
-    <androidx.recyclerview.widget.RecyclerView
-        android:minWidth="25px"
-        android:minHeight="25px"
-        android:scrollbars="vertical"
+
+    <ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/brightnessList" />
+        android:layout_height="wrap_content">
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layoutMain"
+            android:padding="16dp"
+            android:isScrollContainer="false">
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:minWidth="25px"
+                android:minHeight="25px"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/buttonContainer"
+                android:gravity="left">
+                <Button
+                    android:text="Pridať"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/buttonAddNew"
+                    android:layout_margin="8dp"
+                    android:padding="32dp" />
+
+                <Button
+                    android:text="Uložiť"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/buttonSave"
+                    android:layout_margin="8dp"
+                    android:padding="32dp" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:minWidth="25px"
+                android:minHeight="25px"
+                android:scrollbars="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/brightnessList"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

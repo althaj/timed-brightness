@@ -11,6 +11,7 @@ using Android.Widget;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AndroidX.RecyclerView.Widget;
+using Google.Android.Material.Button;
 
 namespace TimedBrightness
 {
@@ -27,11 +28,8 @@ namespace TimedBrightness
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
-            AndroidX.AppCompat.Widget.Toolbar toolbar = FindViewById<AndroidX.AppCompat.Widget.Toolbar>(Resource.Id.toolbar);
-            SetSupportActionBar(toolbar);
-
-            FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
-            fab.Click += FabOnClick;
+            MaterialButton addNew = FindViewById<MaterialButton>(Resource.Id.buttonAddNew);
+            addNew.Click += AddNewOnClick;
 
             // Build sample data
             brightnessSettings.Add(new BrightnessSetting()
@@ -80,7 +78,7 @@ namespace TimedBrightness
             return base.OnOptionsItemSelected(item);
         }
 
-        private void FabOnClick(object sender, EventArgs eventArgs)
+        private void AddNewOnClick(object sender, EventArgs eventArgs)
         {
             View view = (View) sender;
             brightnessSettings.Add(new BrightnessSetting()
