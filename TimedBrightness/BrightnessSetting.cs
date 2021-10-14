@@ -96,6 +96,10 @@ namespace TimedBrightness
             vh.DeleteButton.Click += DeleteItemOnClick;
 
             vh.ItemView.LayoutParameters.Height = 128;
+
+            vh.HourPicker.ValueChanged += HourPicker_ValueChanged;
+            vh.MinutePicker.ValueChanged += MinutePicker_ValueChanged;
+            vh.BrightnessBar.ProgressChanged += BrightnessBar_ProgressChanged;
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
@@ -122,6 +126,48 @@ namespace TimedBrightness
             };
 
             h.PostDelayed(deleteAction, animation.Duration);
+        }
+
+        private void HourPicker_ValueChanged(object sender, NumberPicker.ValueChangeEventArgs e)
+        {
+            NumberPicker picker = (NumberPicker)sender;
+            LinearLayout layout = picker.Parent as LinearLayout;
+            RecyclerView view = layout.Parent as RecyclerView;
+
+            try
+            {
+                int index = view.GetChildAdapterPosition(layout);
+                items[index].Hour = picker.Value;
+            }
+            catch { }
+        }
+
+        private void MinutePicker_ValueChanged(object sender, NumberPicker.ValueChangeEventArgs e)
+        {
+            NumberPicker picker = (NumberPicker)sender;
+            LinearLayout layout = picker.Parent as LinearLayout;
+            RecyclerView view = layout.Parent as RecyclerView;
+
+            try
+            {
+                int index = view.GetChildAdapterPosition(layout);
+                items[index].MinuteString = BrightnessSetting.minuteValues[picker.Value];
+            }
+            catch { }
+        }
+
+        private void BrightnessBar_ProgressChanged(object sender, SeekBar.ProgressChangedEventArgs e)
+        {
+            SeekBar seekBar = (SeekBar)sender;
+            LinearLayout layout = seekBar.Parent as LinearLayout;
+            RecyclerView view = layout.Parent as RecyclerView;
+
+            try
+            {
+                int index = view.GetChildAdapterPosition(layout);
+                items[index].Brightness = seekBar.Progress / 100.0f;
+            }
+            catch { }
         }
     }
 }

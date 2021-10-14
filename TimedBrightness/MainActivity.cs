@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Button;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
 
 namespace TimedBrightness
 {
@@ -30,29 +33,10 @@ namespace TimedBrightness
 
             MaterialButton addNew = FindViewById<MaterialButton>(Resource.Id.buttonAddNew);
             addNew.Click += AddNewOnClick;
+            MaterialButton save = FindViewById<MaterialButton>(Resource.Id.buttonSave);
+            save.Click += SaveOnClick;
 
-            // Build sample data
-            brightnessSettings.Add(new BrightnessSetting()
-            {
-                Hour = 8,
-                MinuteString = "30",
-                Brightness = 0.9f
-            });
-
-            brightnessSettings.Add(new BrightnessSetting()
-            {
-                Hour = 20,
-                MinuteString = "00",
-                Brightness = 0.5f
-            });
-
-            brightnessSettings.Add(new BrightnessSetting()
-            {
-                Hour = 22,
-                MinuteString = "30",
-                Brightness = 0.2f
-            });
-
+            LoadData();
 
             BrightnessSettingAdapter adapter = new BrightnessSettingAdapter(this, brightnessSettings);
             recyclerView = FindViewById<RecyclerView>(Resource.Id.brightnessList);
@@ -90,11 +74,68 @@ namespace TimedBrightness
             recyclerView.GetAdapter().NotifyDataSetChanged();
         }
 
+        private void SaveOnClick(object sender, EventArgs eventArgs)
+        {
+            SaveData();
+        }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        /// <summary>
+        /// Load data from an XML file.
+        /// </summary>
+        private void LoadData()
+        {
+            var filePath = GetSaveFilePath();
+            XmlSerializer serializer = new XmlSerializer(typeof(List<BrightnessSetting>));
+
+            if (!File.Exists(filePath))
+            {
+                brightnessSettings = new List<BrightnessSetting>();
+                SaveData(serializer);
+            }
+            else
+            {
+                using (XmlReader reader = XmlReader.Create(filePath))
+                {
+                    brightnessSettings = (List<BrightnessSetting>)serializer.Deserialize(reader);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Save data to an XML file.
+        /// </summary>
+        /// <param name="serializer">XML serializer to save data.</param>
+        private void SaveData(XmlSerializer serializer = null)
+        {
+            var filePath = GetSaveFilePath();
+
+            if(brightnessSettings == null)
+                brightnessSettings = new List<BrightnessSetting>();
+
+            if (serializer == null)
+                serializer = new XmlSerializer(typeof(List<BrightnessSetting>));
+
+            TextWriter writer = new StreamWriter(filePath);
+            serializer.Serialize(writer, brightnessSettings);
+            writer.Close();
+
+        }
+
+        /// <summary>
+        /// Get the path to the save file.
+        /// </summary>
+        /// <returns>Path to the save file.</returns>
+        private string GetSaveFilePath()
+        {
+            var folderPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(folderPath, "save.xml");
         }
     }
 }
