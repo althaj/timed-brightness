@@ -37,7 +37,7 @@ namespace TimedBrightness
             }
         }
         public string MinuteString { get; set; }
-        public float Brightness { get; set; }
+        public int Brightness { get; set; }
     }
 
     public class BrightnessSettingViewHolder : RecyclerView.ViewHolder
@@ -89,8 +89,8 @@ namespace TimedBrightness
             vh.MinutePicker.SetDisplayedValues(BrightnessSetting.minuteValues);
             vh.MinutePicker.Value = item.MinuteIndex;
 
-            vh.BrightnessBar.Max = 100;
-            vh.BrightnessBar.Progress = (int)(item.Brightness * 100);
+            vh.BrightnessBar.Max = 255;
+            vh.BrightnessBar.Progress = (item.Brightness);
 
             vh.DeleteButton.Click -= DeleteItemOnClick;
             vh.DeleteButton.Click += DeleteItemOnClick;
@@ -165,7 +165,7 @@ namespace TimedBrightness
             try
             {
                 int index = view.GetChildAdapterPosition(layout);
-                items[index].Brightness = seekBar.Progress / 100.0f;
+                items[index].Brightness = seekBar.Progress;
             }
             catch { }
         }

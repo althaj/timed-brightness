@@ -2,4 +2,6 @@
   <string name="app_name">TimedBrightness</string>
   <string name="action_settings">Settings</string>
   <string name="hour_label">Hodiny</string>
+  <string name="permission_write_settings_rationale">Aplikácia potrebuje povolenie na ukladanie nastavení (nastavenie jasu). Povoľ ukladanie nastavení.</string>
+  <string name="ok">Ok</string>
 </resources>
