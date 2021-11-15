@@ -15,7 +15,7 @@ using System.Text;
 
 namespace TimedBrightness
 {
-    public class BrightnessSetting
+    public class BrightnessSetting : IComparable
     {
         public static readonly string[] minuteValues = new string[] { "00", "10", "20", "30", "40", "50" };
 
@@ -38,6 +38,31 @@ namespace TimedBrightness
         }
         public string MinuteString { get; set; }
         public int Brightness { get; set; }
+
+        public BrightnessSetting()
+        {
+
+        }
+
+        public BrightnessSetting(TimeSpan time)
+        {
+            Hour = time.Hours;
+            int minutes = Math.Clamp((int)(Math.Ceiling(time.Minutes / 10.0d) * 10), 0, 60);
+            MinuteString = minutes.ToString();
+        }
+
+        public int CompareTo(object obj)
+        {
+            BrightnessSetting other = (BrightnessSetting)obj;
+
+            if (Hour == other.Hour && Minute == other.Minute)
+                return 0;
+
+            if (Hour > other.Hour || Hour == other.Hour && Minute > other.Minute)
+                return 1;
+
+            return -1;
+        }
     }
 
     public class BrightnessSettingViewHolder : RecyclerView.ViewHolder

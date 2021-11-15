@@ -27,8 +27,11 @@ namespace TimedBrightness
         List<BrightnessSetting> brightnessSettings = new List<BrightnessSetting>();
         RecyclerView recyclerView;
         RecyclerView.LayoutManager layoutManager;
+        AndroidBrightnessService service;
 
         private const int REQUEST_PERMISSION_WRITE_SETTINGS = 1;
+
+        bool startupDialogDisplayed = false;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -51,6 +54,64 @@ namespace TimedBrightness
             layoutManager = new GridLayoutManager(this, 1, GridLayoutManager.Vertical, false);
             recyclerView.SetLayoutManager(layoutManager);
             recyclerView.SetAdapter(adapter);
+
+            service = new AndroidBrightnessService();
+        }
+
+        /// <summary>
+        /// Handle permission access.
+        /// </summary>
+        private void HandlePermissions()
+        {
+            if (!Settings.System.CanWrite(this))
+            {
+                Snackbar snackbar = Snackbar.Make(FindViewById<View>(Resource.Id.root_view), Resource.String.permission_write_settings_rationale, Snackbar.LengthIndefinite);
+                snackbar.View.FindViewById<TextView>(Resource.Id.snackbar_text).SetMaxLines(5);
+                snackbar.SetAction(Resource.String.ok, new Action<View>(delegate (View obj)
+                {
+                    Intent intent = new Intent(Settings.ActionManageWriteSettings);
+                    intent.SetData(Android.Net.Uri.Parse("package:" + AppInfo.PackageName));
+                    StartActivity(intent);
+                }));
+                snackbar.Show();
+                return;
+            }
+
+            PowerManager pm = (PowerManager)Application.Context.GetSystemService(PowerService);
+            if (!pm.IsIgnoringBatteryOptimizations(AppInfo.PackageName))
+            {
+                Snackbar snackbar = Snackbar.Make(FindViewById<View>(Resource.Id.root_view), Resource.String.permission_battery_optimization_rationale, Snackbar.LengthIndefinite);
+                snackbar.View.FindViewById<TextView>(Resource.Id.snackbar_text).SetMaxLines(5);
+                snackbar.SetAction(Resource.String.ok, new Action<View>(delegate (View obj)
+                    {
+                        Intent intent = new Intent(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                        StartActivity(intent);
+                    }));
+                snackbar.Show();
+                return;
+            }
+
+            if (!startupDialogDisplayed)
+            {
+                startupDialogDisplayed = true;
+
+                Android.App.AlertDialog.Builder startupDialog = new Android.App.AlertDialog.Builder(this);
+                startupDialog.SetTitle(Resource.String.startup_dialog_title);
+                startupDialog.SetMessage(Resource.String.startup_dialog_message);
+                startupDialog.SetPositiveButton(Resource.String.ok, (senderAlert, args) =>
+                {
+                    Intent intent = new Intent(Android.Provider.Settings.ActionApplicationDetailsSettings);
+                    intent.SetData(Android.Net.Uri.Parse("package:" + AppInfo.PackageName));
+                    StartActivity(intent);
+                });
+
+                startupDialog.SetNegativeButton(Resource.String.dismiss, (senderAlert, args) =>
+                {
+                });
+
+                Dialog dialog = startupDialog.Create();
+                dialog.Show();
+            }
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -88,20 +149,13 @@ namespace TimedBrightness
 
             if (!Settings.System.CanWrite(this))
             {
-                Intent intent = new Intent(Settings.ActionManageWriteSettings);
-                intent.SetData(Android.Net.Uri.Parse("package:" + AppInfo.PackageName));
-                StartActivity(intent);
-            } else
+                HandlePermissions();
+            }
+            else
             {
                 if (brightnessSettings.Count > 0)
                 {
-                    AndroidBrightnessService service = new AndroidBrightnessService();
-
-                    Console.WriteLine(service.GetBrightness());
-
-                    service.SetBrightness((int)brightnessSettings[0].Brightness);
-
-                    Console.WriteLine(service.GetBrightness());
+                    service.UpdateService();
                 }
             }
         }
@@ -125,6 +179,12 @@ namespace TimedBrightness
                     }
                     break;
             }
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            HandlePermissions();
         }
     }
 }

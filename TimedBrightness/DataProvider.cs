@@ -55,7 +55,7 @@ namespace TimedBrightness
             if (brightnessSettings == null)
                 brightnessSettings = new List<BrightnessSetting>();
 
-            brightnessSettings = brightnessSettings.OrderBy(x => x.Hour).OrderBy(x => x.Minute).ToList(); ;
+            brightnessSettings = brightnessSettings.OrderBy(x => x.Minute).OrderBy(x => x.Hour).ToList(); ;
 
             if (serializer == null)
                 serializer = new XmlSerializer(typeof(List<BrightnessSetting>));

@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AndroidBrightnessService .cs" />
+    <Compile Include="BootReceiver.cs" />
     <Compile Include="BrightnessSetting.cs" />
     <Compile Include="DataProvider.cs" />
     <Compile Include="MainActivity.cs" />
