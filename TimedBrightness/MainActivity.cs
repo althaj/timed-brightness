@@ -29,10 +29,13 @@ namespace TimedBrightness
         RecyclerView.LayoutManager layoutManager;
         AndroidBrightnessService service;
 
-        private const int REQUEST_PERMISSION_WRITE_SETTINGS = 1;
+        // Notification fields
+        static readonly int NOTIFICATION_ID = 1000;
+        static readonly string CHANNEL_ID = "brightness_notification";
 
         bool startupDialogDisplayed = false;
 
+        #region Activity methods
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -55,8 +58,23 @@ namespace TimedBrightness
             recyclerView.SetLayoutManager(layoutManager);
             recyclerView.SetAdapter(adapter);
 
-            service = new AndroidBrightnessService();
+            service = new AndroidBrightnessService(this);
+
+            CreateNotificationChannel();
         }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            HandlePermissions();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            service.Destroy();
+        }
+        #endregion
 
         /// <summary>
         /// Handle permission access.
@@ -114,23 +132,6 @@ namespace TimedBrightness
             }
         }
 
-        public override bool OnCreateOptionsMenu(IMenu menu)
-        {
-            MenuInflater.Inflate(Resource.Menu.menu_main, menu);
-            return true;
-        }
-
-        public override bool OnOptionsItemSelected(IMenuItem item)
-        {
-            int id = item.ItemId;
-            if (id == Resource.Id.action_settings)
-            {
-                return true;
-            }
-
-            return base.OnOptionsItemSelected(item);
-        }
-
         private void AddNewOnClick(object sender, EventArgs eventArgs)
         {
             View view = (View)sender;
@@ -160,31 +161,46 @@ namespace TimedBrightness
             }
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        /// <summary>
+        /// Create a channel for notifications.
+        /// </summary>
+        private void CreateNotificationChannel()
         {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            switch (requestCode)
+            if (Build.VERSION.SdkInt < BuildVersionCodes.O)
             {
-                case REQUEST_PERMISSION_WRITE_SETTINGS:
-                    if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
-                    {
-                        Toast.MakeText(this, "Permission Granted!", ToastLength.Short).Show();
-                    }
-                    else
-                    {
-                        Toast.MakeText(this, "Permission Denied!", ToastLength.Short).Show();
-                    }
-                    break;
+                // Notification channels are new in API 26 (and not a part of the
+                // support library). There is no need to create a notification
+                // channel on older versions of Android.
+                return;
             }
+
+            var name = Resources.GetString(Resource.String.channel_name);
+            var description = GetString(Resource.String.channel_description);
+            var channel = new NotificationChannel(CHANNEL_ID, name, NotificationImportance.Low)
+            {
+                Description = description
+            };
+
+            var notificationManager = (NotificationManager)GetSystemService(NotificationService);
+            notificationManager.CreateNotificationChannel(channel);
         }
 
-        protected override void OnResume()
+        /// <summary>
+        /// Send a notification to the device when the brightness changes.
+        /// </summary>
+        /// <param name="brightness">New brightness.</param>
+        public void SendNotification(int brightness)
         {
-            base.OnResume();
-            HandlePermissions();
+            // Build the notification:
+            var builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                          .SetAutoCancel(true)
+                          .SetContentTitle(Resources.GetString(Resource.String.notification_title))
+                          .SetSmallIcon(Resource.Drawable.notification_icon)
+                          .SetContentText(String.Format(Resources.GetString(Resource.String.notification_content), brightness));
+
+            // Finally, publish the notification:
+            var notificationManager = NotificationManagerCompat.From(this);
+            notificationManager.Notify(NOTIFICATION_ID, builder.Build());
         }
     }
 }

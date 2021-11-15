@@ -9,18 +9,38 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 using Xamarin.Essentials;
 
 namespace TimedBrightness
 {
     class AndroidBrightnessService
     {
+        MainActivity activity;
         List<BrightnessSetting> settings;
         BrightnessSetting currentSetting;
+        Timer timer;
 
-        public AndroidBrightnessService()
+        /// <summary>
+        /// Create a new instance of the Brightness service.
+        /// </summary>
+        /// <param name="activity">Main activity.</param>
+        public AndroidBrightnessService(MainActivity activity)
         {
+            this.activity = activity;
+            timer = new Timer();
+            timer.Elapsed += Timer_Elapsed;
             UpdateService();
+        }
+
+        /// <summary>
+        /// Timer event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            SetBrightness();
         }
 
         /// <summary>
@@ -29,10 +49,18 @@ namespace TimedBrightness
         public void UpdateService()
         {
             settings = DataProvider.LoadData();
-            BrightnessSetting currentTime = new BrightnessSetting(DateTime.Now.TimeOfDay);
+            SetBrightness();
+        }
 
+        /// <summary>
+        /// Get the current setting from the settings.
+        /// </summary>
+        /// <returns>Current setting that should be active currently.</returns>
+        private BrightnessSetting GetCurrentSetting()
+        {
             if (settings.Count > 0)
             {
+                BrightnessSetting currentTime = new BrightnessSetting(DateTime.Now.TimeOfDay);
                 currentSetting = settings.Last();
 
                 for (int i = 0; i < settings.Count; i++)
@@ -45,8 +73,7 @@ namespace TimedBrightness
             {
                 currentSetting = null;
             }
-
-            SetBrightness();
+            return currentSetting;
         }
 
         /// <summary>
@@ -56,6 +83,12 @@ namespace TimedBrightness
         public void SetBrightness(int brightness)
         {
             Android.Provider.Settings.System.PutInt(MainActivity.mainActivity.ContentResolver, Android.Provider.Settings.System.ScreenBrightness, brightness);
+
+            activity.SendNotification(brightness);
+
+            timer.Stop();
+            timer.Interval = 600000;
+            timer.Start();
         }
 
         /// <summary>
@@ -63,6 +96,8 @@ namespace TimedBrightness
         /// </summary>
         public void SetBrightness()
         {
+            currentSetting = GetCurrentSetting();
+
             if (currentSetting != null)
                 SetBrightness(currentSetting.Brightness);
         }
@@ -74,6 +109,14 @@ namespace TimedBrightness
         {
             var brightness = Android.Provider.Settings.System.GetInt(MainActivity.mainActivity.ContentResolver, Android.Provider.Settings.System.ScreenBrightness);
             return brightness;
+        }
+
+        /// <summary>
+        /// Dispose of the class.
+        /// </summary>
+        public void Destroy()
+        {
+            timer.Dispose();
         }
     }
 }

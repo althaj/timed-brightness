@@ -19,4 +19,8 @@
   </string>
   <string name="ok">Ok</string>
   <string name="dismiss">Zatvoriť</string>
+  <string name="channel_name">Notifikácie automatického jasu</string>
+  <string name="channel_description">Notifikácie o automatickom nastavení jasu.</string>
+  <string name="notification_title">Jas bol nastavený</string>
+  <string name="notification_content">Jas na zariadení bol nastavený na hodnotu {0}.</string>
 </resources>
