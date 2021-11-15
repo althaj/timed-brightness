@@ -82,9 +82,11 @@ namespace TimedBrightness
         /// <param name="brightness">Brightness of the device.</param>
         public void SetBrightness(int brightness)
         {
-            Android.Provider.Settings.System.PutInt(MainActivity.mainActivity.ContentResolver, Android.Provider.Settings.System.ScreenBrightness, brightness);
-
-            activity.SendNotification(brightness);
+            if (GetBrightness() != brightness)
+            {
+                Android.Provider.Settings.System.PutInt(MainActivity.mainActivity.ContentResolver, Android.Provider.Settings.System.ScreenBrightness, brightness);
+                activity.SendNotification(brightness);
+            }
 
             timer.Stop();
             timer.Interval = 600000;
