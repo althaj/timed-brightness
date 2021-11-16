@@ -3,60 +3,75 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    
     android:orientation="horizontal"
-    android:minWidth="25px"
-    android:minHeight="25px"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:id="@+id/brightnessListItem"
-    android:layout_margin="8dp"
-    android:padding="8dp">
-    <TextView
-        android:text="Hodiny"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_gravity="center_vertical"
-        android:padding="8dp" />
-    <NumberPicker
-        android:id="@+id/hourPicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:text="Minúty"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_gravity="center_vertical"
-        android:padding="8dp" />
-    <NumberPicker
-        android:id="@+id/minutePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <ImageView
-        android:src="@drawable/baseline_light_mode_24"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:id="@+id/imageView1"
-        android:layout_gravity="center_vertical"
-        android:contentDescription="" />
-    <SeekBar
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/brightnessBar"
-        android:paddingEnd="136dp" />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/brightnessListItem">
     <ImageButton
         android:src="@drawable/baseline_delete_24"
-        android:layout_height="match_parent"
-        android:layout_width="128dp"
+        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
         android:id="@+id/deleteButton"
-        android:contentDescription=""
-        android:layout_marginStart="-128dp"
+        android:contentDescription="@string/delete_button_description"
         android:backgroundTint="#ffff8a80"
-        android:padding="16dp" />
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:paddingTop="54dp"
+        android:paddingBottom="54dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout1">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/linearLayout2">
+            <TextView
+                android:text="@string/hour_label"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp" />
+            <NumberPicker
+                android:id="@+id/hourPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="@string/minute_label"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp" />
+            <NumberPicker
+                android:id="@+id/minutePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/linearLayout3">
+            <ImageView
+                android:src="@drawable/baseline_light_mode_24"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:id="@+id/imageView1"
+                android:layout_gravity="center_vertical"
+                android:contentDescription=""/>
+            <SeekBar
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/brightnessBar"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

@@ -120,8 +120,6 @@ namespace TimedBrightness
             vh.DeleteButton.Click -= DeleteItemOnClick;
             vh.DeleteButton.Click += DeleteItemOnClick;
 
-            vh.ItemView.LayoutParameters.Height = 128;
-
             vh.HourPicker.ValueChanged += HourPicker_ValueChanged;
             vh.MinutePicker.ValueChanged += MinutePicker_ValueChanged;
             vh.BrightnessBar.ProgressChanged += BrightnessBar_ProgressChanged;
